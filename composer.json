@@ -1,0 +1,22 @@
+{
+    "name": "miraiportal/laravel-kagero",
+    "version": "1.0.2",
+    "license": "MIT",
+    "require": {
+        "php": "^8.5",
+        "inertiajs/inertia-laravel": "^3.0",
+        "laravel/framework": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "LaravelKagero\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaravelKagero\\KageroServiceProvider"
+            ]
+        }
+    }
+}
