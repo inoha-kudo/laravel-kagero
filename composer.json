@@ -1,0 +1,24 @@
+{
+    "name": "miraiportal/laravel-kagero",
+    "description": "Laravel integration for Kagero.",
+    "version": "0.1.0",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.5",
+        "inertiajs/inertia-laravel": "^3.0",
+        "laravel/framework": "^13.17"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kagero\\Laravel\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Kagero\\Laravel\\KageroServiceProvider"
+            ]
+        }
+    }
+}
