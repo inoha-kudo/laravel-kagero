@@ -29,7 +29,7 @@ final class KageroServiceProvider extends ServiceProvider
             ], 'kagero-config');
         }
 
-        $this->callAfterResolving(KernelContract::class, function (Kernel $kernel): void {
+        $this->callAfterResolving(KernelContract::class, function (Kernel $kernel) {
             $kernel->appendMiddlewareToGroup('web', HandleInertiaProxyRequests::class);
         });
     }
