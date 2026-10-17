@@ -34,6 +34,12 @@ final class HandleInertiaProxyRequests
 
         if (! $isInertiaRequest) {
             $request->headers->remove(Header::INERTIA);
+
+            if ($response->getStatusCode() === 409 && filled($location = $response->headers->get(Header::LOCATION))) {
+                $response->headers->remove(Header::LOCATION);
+                $response->headers->set('Location', $location);
+                $response->setStatusCode(302);
+            }
         }
 
         return $response;
