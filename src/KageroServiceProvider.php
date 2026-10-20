@@ -8,6 +8,7 @@ use Illuminate\Contracts\Http\Kernel as KernelContract;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\ServiceProvider;
+use LaravelKagero\Console\Commands\KageroGenerateCommand;
 use LaravelKagero\Http\Middleware\HandleInertiaProxyRequests;
 use LaravelKagero\Http\Middleware\TrustKageroHeaders;
 
@@ -27,6 +28,10 @@ final class KageroServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../config/kagero.php' => $this->app->configPath('kagero.php'),
             ], 'kagero-config');
+
+            $this->commands([
+                KageroGenerateCommand::class,
+            ]);
         }
 
         $this->callAfterResolving(KernelContract::class, function (Kernel $kernel) {
