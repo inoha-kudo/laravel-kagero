@@ -25,12 +25,18 @@ final class KageroGenerateCommand extends Command
         /** @var array<string, array<string, mixed>> $manifest */
         $manifest = File::json($manifestPath, JSON_THROW_ON_ERROR);
 
+        $entries = collect($manifest)->where('isEntry', true)->keys()->all();
+
+        if ($entries === []) {
+            $this->fail('Vite manifest has no entries. Run `npm run build` first.');
+        }
+
         $vite->useHotFile('')->createAssetPathsUsing(fn (string $path): string => '/'.$path);
 
         $rootView = [
             'version' => hash_file('xxh128', $manifestPath),
             'fonts' => $vite->fonts()->toHtml(),
-            'vite' => $vite(['resources/css/app.css', 'resources/js/app.ts'])->toHtml(),
+            'vite' => $vite($entries)->toHtml(),
             'pages' => (object) $this->pages($vite, $manifest),
         ];
 
@@ -48,10 +54,22 @@ final class KageroGenerateCommand extends Command
      */
     private function pages(Vite $vite, array $manifest): array
     {
+        /** @var list<string> $paths */
+        $paths = config('inertia.pages.paths');
+
+        /** @var list<string> $extensions */
+        $extensions = config('inertia.pages.extensions');
+
+        $pattern = sprintf(
+            '#^(?:%s)/(.+)\.(?:%s)$#',
+            implode('|', array_map(preg_quote(...), $paths)),
+            implode('|', array_map(preg_quote(...), $extensions)),
+        );
+
         $pages = [];
 
         foreach (array_keys($manifest) as $key) {
-            if (preg_match('#^resources/js/pages/(.+)\.vue$#', $key, $matches)) {
+            if (preg_match($pattern, base_path($key), $matches)) {
                 $pages[$matches[1]] = $vite([$key])->toHtml();
             }
         }
