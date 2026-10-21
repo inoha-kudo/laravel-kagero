@@ -9,6 +9,8 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Vite;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
+use Symfony\Component\Filesystem\Path;
 
 #[Signature('kagero:generate')]
 #[Description('Generate the root view manifest for Kagero')]
@@ -60,17 +62,15 @@ final class KageroGenerateCommand extends Command
         /** @var list<string> $extensions */
         $extensions = config('inertia.pages.extensions');
 
-        $pattern = sprintf(
-            '#^(?:%s)/(.+)\.(?:%s)$#',
-            implode('|', array_map(preg_quote(...), $paths)),
-            implode('|', array_map(preg_quote(...), $extensions)),
-        );
-
         $pages = [];
 
         foreach (array_keys($manifest) as $key) {
-            if (preg_match($pattern, base_path($key), $matches)) {
-                $pages[$matches[1]] = $vite([$key])->toHtml();
+            $file = base_path($key);
+
+            foreach ($paths as $path) {
+                if (Path::isBasePath($path, $file) && Path::hasExtension($file, $extensions)) {
+                    $pages[Str::beforeLast(Path::makeRelative($file, $path), '.')] = $vite([$key])->toHtml();
+                }
             }
         }
 
