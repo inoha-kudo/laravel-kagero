@@ -65,10 +65,8 @@ final class KageroGenerateCommand extends Command
         $pages = [];
 
         foreach (array_keys($manifest) as $key) {
-            $file = base_path($key);
-
             foreach ($paths as $path) {
-                if (Path::isBasePath($path, $file) && Path::hasExtension($file, $extensions)) {
+                if (Path::isBasePath($path, $file = base_path($key)) && Path::hasExtension($file, $extensions)) {
                     $pages[Str::beforeLast(Path::makeRelative($file, $path), '.')] = $vite([$key])->toHtml();
                 }
             }
