@@ -32,25 +32,29 @@ final class KageroGenerateCommand extends Command
         /** @var array<string, array<string, mixed>> $manifest */
         $manifest = File::json($manifestPath, JSON_THROW_ON_ERROR);
 
-        $entries = collect($manifest)->where('isEntry', true)->keys()->all();
-
-        $this->vite->useHotFile('')->createAssetPathsUsing(fn (string $path): string => '/'.$path);
-
-        $rootView = [
-            'version' => hash_file('xxh128', $manifestPath),
-            'fonts' => $this->vite->fonts()->toHtml(),
-            'vite' => $this->vite->withEntryPoints($entries)->toHtml(),
-            'pages' => (object) $this->pages($manifest),
-        ];
-
-        $json = json_encode($rootView, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        $this->vite->useHotFile('')->createAssetPathsUsing(fn (string $path) => '/'.$path);
 
         $rootViewPath = resource_path('js/kagero/root-view.json');
 
         File::ensureDirectoryExists(dirname($rootViewPath));
-        File::replace($rootViewPath, $json);
+
+        File::replace($rootViewPath, json_encode([
+            'version' => hash_file('xxh128', $manifestPath),
+            'fonts' => $this->vite->fonts()->toHtml(),
+            'vite' => $this->vite->withEntryPoints($this->entries($manifest))->toHtml(),
+            'pages' => (object) $this->pages($manifest),
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
         $this->components->info("Root view manifest for Kagero [$rootViewPath] generated successfully.");
+    }
+
+    /**
+     * @param  array<string, array<string, mixed>>  $manifest
+     * @return array<int, string>
+     */
+    private function entries(array $manifest): array
+    {
+        return collect($manifest)->where('isEntry', true)->keys()->all();
     }
 
     /**
