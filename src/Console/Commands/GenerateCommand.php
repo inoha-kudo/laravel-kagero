@@ -14,7 +14,7 @@ use Symfony\Component\Filesystem\Path;
 
 #[Signature('kagero:generate')]
 #[Description('Generate the root view manifest for Kagero')]
-final class KageroGenerateCommand extends Command
+final class GenerateCommand extends Command
 {
     public function __construct(private readonly Vite $vite)
     {

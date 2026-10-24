@@ -8,7 +8,7 @@ use Illuminate\Contracts\Http\Kernel as KernelContract;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\ServiceProvider;
-use LaravelKagero\Console\Commands\KageroGenerateCommand;
+use LaravelKagero\Console\Commands\GenerateCommand;
 use LaravelKagero\Http\Middleware\HandleInertiaProxyRequests;
 use LaravelKagero\Http\Middleware\TrustKageroHeaders;
 
@@ -30,7 +30,7 @@ final class KageroServiceProvider extends ServiceProvider
             ], 'kagero-config');
 
             $this->commands([
-                KageroGenerateCommand::class,
+                GenerateCommand::class,
             ]);
         }
 
