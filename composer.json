@@ -1,10 +1,10 @@
 {
     "name": "miraiportal/laravel-kagero",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "license": "MIT",
     "require": {
         "php": "^8.5",
-        "inertiajs/inertia-laravel": "^3.0",
+        "inertiajs/inertia-laravel": "^3.0.3",
         "laravel/framework": "^13.0"
     },
     "autoload": {
