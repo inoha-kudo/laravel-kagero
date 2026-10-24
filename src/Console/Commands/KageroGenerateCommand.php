@@ -23,6 +23,8 @@ final class KageroGenerateCommand extends Command
 
     public function handle(): void
     {
+        $this->vite->useHotFile('')->createAssetPathsUsing(fn (string $path) => '/'.$path);
+
         $manifestPath = public_path('build/manifest.json');
 
         if (! File::exists($manifestPath)) {
@@ -32,17 +34,15 @@ final class KageroGenerateCommand extends Command
         /** @var array<string, array<string, mixed>> $manifest */
         $manifest = File::json($manifestPath, JSON_THROW_ON_ERROR);
 
-        $this->vite->useHotFile('')->createAssetPathsUsing(fn (string $path) => '/'.$path);
-
         $rootViewPath = resource_path('js/kagero/root-view.json');
 
         File::ensureDirectoryExists(dirname($rootViewPath));
 
         File::replace($rootViewPath, json_encode([
             'version' => hash_file('xxh128', $manifestPath),
-            'fonts' => $this->vite->fonts()->toHtml(),
-            'vite' => $this->vite->withEntryPoints($this->entries($manifest))->toHtml(),
+            'vite' => $this->vite->withEntryPoints($this->entryPoints($manifest))->toHtml(),
             'pages' => (object) $this->pages($manifest),
+            'fonts' => $this->vite->fonts()->toHtml(),
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
         $this->components->info("Root view manifest for Kagero [$rootViewPath] generated successfully.");
@@ -52,14 +52,14 @@ final class KageroGenerateCommand extends Command
      * @param  array<string, array<string, mixed>>  $manifest
      * @return array<int, string>
      */
-    private function entries(array $manifest): array
+    private function entryPoints(array $manifest): array
     {
-        return collect($manifest)->where('isEntry', true)->keys()->all();
+        return collect($manifest)->where('isEntry')->keys()->all();
     }
 
     /**
      * @param  array<string, array<string, mixed>>  $manifest
-     * @return array<string, string>
+     * @return array<array-key, string>
      */
     private function pages(array $manifest): array
     {
