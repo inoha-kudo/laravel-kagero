@@ -69,12 +69,16 @@ final class GenerateCommand extends Command
         /** @var list<string> $extensions */
         $extensions = config('inertia.pages.extensions');
 
+        $entryPoints = $this->entryPoints($manifest);
+
         $pages = [];
 
         foreach (array_reverse($paths) as $path) {
             foreach (array_keys($manifest) as $key) {
                 if (Path::isBasePath($path, $file = base_path($key)) && Path::hasExtension($file, $extensions)) {
-                    $pages[Str::beforeLast(Path::makeRelative($file, $path), '.')] = $this->vite->withEntryPoints([$key])->toHtml();
+                    $this->vite->flush();
+
+                    $pages[Str::beforeLast(Path::makeRelative($file, $path), '.')] = $this->vite->withEntryPoints([...$entryPoints, $key])->toHtml();
                 }
             }
         }
