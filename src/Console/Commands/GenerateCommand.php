@@ -40,21 +40,11 @@ final class GenerateCommand extends Command
 
         File::replace($rootViewPath, json_encode([
             'version' => hash_file('xxh128', $manifestPath),
-            'vite' => $this->vite->withEntryPoints($this->entryPoints($manifest))->toHtml(),
             'pages' => (object) $this->pages($manifest),
             'fonts' => $this->vite->fonts()->toHtml(),
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
         $this->components->info("Root view manifest for Kagero [$rootViewPath] generated successfully.");
-    }
-
-    /**
-     * @param  array<string, array<string, mixed>>  $manifest
-     * @return array<string>
-     */
-    private function entryPoints(array $manifest): array
-    {
-        return collect($manifest)->where('isEntry')->keys()->all();
     }
 
     /**
@@ -69,7 +59,7 @@ final class GenerateCommand extends Command
         /** @var list<string> $extensions */
         $extensions = config('inertia.pages.extensions');
 
-        $entryPoints = $this->entryPoints($manifest);
+        $entryPoints = collect($manifest)->where('isEntry')->keys()->all();
 
         $pages = [];
 
